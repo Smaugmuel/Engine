@@ -5,6 +5,7 @@
 #include "../Engine/Math/Math.hpp"
 
 #include <algorithm>
+#include <iostream>
 
 //#include "PlayState.hpp"
 //#include "MainMenuState.hpp"
@@ -32,6 +33,9 @@ bool Game::Initialize()
 {
 	if (!m_engine.Initialize(Vector2i(1500, 800)))
 		return false;
+
+	m_t1 = Clock::now();
+	m_t2 = Clock::now();
 	
 	/*if (!SceneStorage::Get()->LoadScene("Scene1"))
 		return false;
@@ -95,8 +99,9 @@ bool Game::Initialize()
 	int* textureIndices = objectData->textureIndices;
 
 
-	const unsigned int nObjX = 64;
+	const unsigned int nObjX = 32;
 	const unsigned int nObjZ = 32;
+
 	Vector3f offset(4, 0, 4);
 	Vector3f startPos = Vector3f(static_cast<float>(nObjX) * offset.x, 0.0f, static_cast<float>(nObjZ) * offset.z) * -0.5f;
 
@@ -176,12 +181,17 @@ bool Game::Initialize()
 
 void Game::Run()
 {
-	SceneManagerV3* sceneManager = m_engine.GetSceneManager();
-	DataStorage* dataStorage = sceneManager->GetData();
-	ObjectData* objectData = dataStorage->GetObjectData();
-
 	while (true)
 	{
+
+		/*
+			Calculate frame time
+		*/
+		m_t1 = m_t2;
+		m_t2 = Clock::now();
+		long long nanoSeconds = std::chrono::duration_cast<std::chrono::nanoseconds>(m_t2 - m_t1).count();
+		float dt = static_cast<float>(nanoSeconds * 0.000000001);
+
 		/*if (m_pop_game_state_flag)
 		{
 			m_gameStateMachine.Pop();
@@ -199,123 +209,29 @@ void Game::Run()
 			}
 		}*/
 
+
+		/*
+			(VK_MBUTTON == Scroll Wheel)
+			If Scroll is down, use FPS controls, else turn them off.
+		*/
+		if (m_engine.GetInput()->IsKeyDown(VK_MBUTTON)) {
+			//std::cout << "Scroll Down" << std::endl;
+			m_UseFPSControls = true;
+			CheckFPSRelatedInput(dt);
+		}
+		else {
+			m_UseFPSControls = false;
+			CheckNonFPSRelatedInput(dt);
+		}
+
 		/*if (Input::Get()->IsKeyPressed('T'))
 		{
 			sceneManager->SetObjectModel(5000, "generator.obj");
 		}*/
 
 
-		if (!m_engine.Update())
+		if (!m_engine.Update(dt))
 			break;
-		
-		if (m_engine.GetInput()->IsKeyDown('E'))
-		{
-			CameraV3* camera = m_engine.GetCameraManager()->GetCamera(m_cameraIndex);
-			Math::Ray ray = Math::CalculatePickingRay(camera->viewMatrix, camera->projectionMatrix, m_engine.GetInput()->MousePosition(), m_engine.GetWindowSize());
-	
-			objectData->positions[0] = ray.origin + ray.direction * 10;
-
-			Math::Sphere sphere;
-			Math::OBB obb;
-			sphere.position = objectData->positions[0];
-			obb.center = objectData->positions[m_objects.size() - 1];
-			obb.halfSides[0] = objectData->scales[m_objects.size() - 1].x;
-			obb.halfSides[1] = objectData->scales[m_objects.size() - 1].y;
-			obb.halfSides[2] = objectData->scales[m_objects.size() - 1].z;
-			if (Math::Collision::SphereVsOBB(sphere, obb))
-			{
-				objectData->textureIndices[0] = 0;
-			}
-			else
-			{
-				objectData->textureIndices[0] = 1;
-			}
-		}
-
-
-		if (m_engine.GetInput()->IsKeyPressed('G'))
-		{
-			for (unsigned int i = 0; i < 3; i++)
-			{
-				dataStorage->GetLightData()->positions[i] = Vector3f(0, 10, 0);
-			}
-			dataStorage->GetLightData()->diffuseColors[0] = Vector3f(1, 0, 0);
-			dataStorage->GetLightData()->diffuseColors[1] = Vector3f(0, 1, 0);
-			dataStorage->GetLightData()->diffuseColors[2] = Vector3f(0, 0, 1);
-		}
-
-		if (m_engine.GetInput()->IsKeyPressed('R'))
-		{
-			Vector3f* positions = objectData->positions;
-			Vector3f* movements = objectData->movements;
-			unsigned int nrOfObjects = dataStorage->GetNrOfObjects();
-			for (unsigned int i = 0; i < nrOfObjects; i++)
-			{
-				positions[i] = Vector3f(0, 0, 0);
-				movements[i] = Vector3f(0, 0, 0);
-			}
-		}
-		if (m_engine.GetInput()->IsKeyPressed('T'))
-		{
-			Vector3f* movements = objectData->movements;
-			Vector3f* rotationAxises = objectData->rotationAxises;
-
-			unsigned int nrOfObjects = dataStorage->GetNrOfObjects();
-			for (unsigned int i = 0; i < nrOfObjects; i++)
-			{
-				float randX = (static_cast<float>(rand() % 1000) * 0.002f) - 1.0f;
-				float randY = (static_cast<float>(rand() % 1000) * 0.002f) - 1.0f;
-				float randZ = (static_cast<float>(rand() % 1000) * 0.002f) - 1.0f;
-
-				movements[i] = Vector3f(randX, randY, randZ).normalized() * 10.0f;
-				rotationAxises[i] = movements[i].crossLH(Vector3f(0, 1, 0));
-			}
-		}
-
-		if (m_engine.GetInput()->IsKeyPressed(VK_LBUTTON))
-		{
-			unsigned int nrOfObjects = dataStorage->GetNrOfObjects();
-			if (nrOfObjects > 0)
-			{
-				CameraV3* camera = m_engine.GetCameraManager()->GetCamera(m_cameraIndex);
-				Math::Ray ray = Math::CalculatePickingRay(camera->viewMatrix, camera->projectionMatrix, m_engine.GetInput()->MousePosition(), m_engine.GetWindowSize());
-
-				Vector3f* positions = objectData->positions;
-				Vector3f* movements = objectData->movements;
-				Vector3f* rotationAxises = objectData->rotationAxises;
-				int* textures = objectData->textureIndices;
-				Math::Sphere sphere;
-
-				float minDistance = INFINITY;
-				int minDistanceIndex = -1;
-
-				// Find the closest intersection
-				for (unsigned int i = 0; i < nrOfObjects; i++)
-				{
-					sphere.position = positions[i];
-
-					Math::Collision::RayIntersection intersection = Math::Collision::RayVsSphere(ray, sphere);
-					if (intersection.collisionOccured)
-					{
-						if (intersection.distance < minDistance)
-						{
-							minDistance = intersection.distance;
-							minDistanceIndex = i;
-						}
-					}
-				}
-
-				// Change the movement of the closest intersection, if any
-				if (minDistanceIndex != -1)
-				{
-					float randX = (static_cast<float>(rand() % 1000) * 0.002f) - 1.0f;
-					float randY = (static_cast<float>(rand() % 1000) * 0.002f) - 1.0f;
-					float randZ = (static_cast<float>(rand() % 1000) * 0.002f) - 1.0f;
-					movements[minDistanceIndex] = Vector3f(randX, randY, randZ).normalized() * 10.0f;
-					textures[minDistanceIndex] = 0;
-				}
-			}
-		}
 
 		m_engine.Clear(0, 0, 0, 1);
 		m_engine.Render();
@@ -335,4 +251,206 @@ void Game::ReceiveEvent(const Event & e)
 	default:
 		break;
 	}*/
+}
+
+void Game::CheckFPSRelatedInput(float dt)
+{
+	CameraV3* cam = m_engine.GetActiveCamera();
+	Input* input = m_engine.GetInput();
+	if (cam){
+		bool isChanged = false;
+
+		float movementSpeed = 10.0f;
+		float rotationSpeed = 0.2f;
+
+		if (input->IsKeyDown('B'))
+			movementSpeed *= 10.0f;
+
+		if (input->IsKeyDown('D'))
+		{
+			cam->MoveRight(movementSpeed * dt);
+			isChanged = true;
+		}
+		if (input->IsKeyDown('A'))
+		{
+			cam->MoveRight(-movementSpeed * dt);
+			isChanged = true;
+		}
+		if (input->IsKeyDown('W'))
+		{
+			cam->MoveForward(movementSpeed * dt);
+			isChanged = true;
+		}
+		if (input->IsKeyDown('S'))
+		{
+			cam->MoveForward(-movementSpeed * dt);
+			isChanged = true;
+		}
+		if (input->IsKeyDown(VK_SPACE))
+		{
+			cam->MoveUp(movementSpeed * dt);
+			isChanged = true;
+		}
+		if (input->IsKeyDown(VK_SHIFT))
+		{
+			cam->MoveUp(-movementSpeed * dt);
+			isChanged = true;
+		}
+
+		/*Control camera rotation*/
+		Vector2i dm = input->MouseMovement();
+		if (dm.x != 0) {
+			cam->RotateRight(-rotationSpeed * dt * dm.x);
+			isChanged = true;
+		}
+
+		if (dm.y != 0) {
+			cam->RotateUp(rotationSpeed * dt * dm.y);
+			isChanged = true;
+		}
+
+		if (input->IsKeyDown(VK_UP))
+		{
+			cam->RotateUp(-rotationSpeed * dt);
+			isChanged = true;
+		}
+		if (input->IsKeyDown(VK_DOWN))
+		{
+			cam->RotateUp(rotationSpeed * dt);
+			isChanged = true;
+		}
+		if (input->IsKeyDown(VK_RIGHT))
+		{
+			cam->RotateRight(-rotationSpeed * dt);
+			isChanged = true;
+		}
+		if (input->IsKeyDown(VK_LEFT))
+		{
+			cam->RotateRight(rotationSpeed * dt);
+			isChanged = true;
+		}
+
+
+		if (isChanged)
+		{
+			cam->UpdateViewMatrix();
+			m_engine.GetSceneManager()->SetViewAndProjectionMatrices(cam->viewMatrix, cam->projectionMatrix);
+		}
+	}
+}
+
+void Game::CheckNonFPSRelatedInput(float dt)
+{
+	SceneManagerV3* sceneManager = m_engine.GetSceneManager();
+	DataStorage* dataStorage = sceneManager->GetData();
+	ObjectData* objectData = dataStorage->GetObjectData();
+
+	if (m_engine.GetInput()->IsKeyDown('E'))
+	{
+		CameraV3* camera = m_engine.GetCameraManager()->GetCamera(m_cameraIndex);
+		Math::Ray ray = Math::CalculatePickingRay(camera->viewMatrix, camera->projectionMatrix, m_engine.GetInput()->MousePosition(), m_engine.GetWindowSize());
+
+		objectData->positions[0] = ray.origin + ray.direction * 10;
+
+		Math::Sphere sphere;
+		Math::OBB obb;
+		sphere.position = objectData->positions[0];
+		obb.center = objectData->positions[m_objects.size() - 1];
+		obb.halfSides[0] = objectData->scales[m_objects.size() - 1].x;
+		obb.halfSides[1] = objectData->scales[m_objects.size() - 1].y;
+		obb.halfSides[2] = objectData->scales[m_objects.size() - 1].z;
+		if (Math::Collision::SphereVsOBB(sphere, obb))
+		{
+			objectData->textureIndices[0] = 0;
+		}
+		else
+		{
+			objectData->textureIndices[0] = 1;
+		}
+	}
+
+
+	if (m_engine.GetInput()->IsKeyPressed('G'))
+	{
+		for (unsigned int i = 0; i < 3; i++)
+		{
+			dataStorage->GetLightData()->positions[i] = Vector3f(0, 10, 0);
+		}
+		dataStorage->GetLightData()->diffuseColors[0] = Vector3f(1, 0, 0);
+		dataStorage->GetLightData()->diffuseColors[1] = Vector3f(0, 1, 0);
+		dataStorage->GetLightData()->diffuseColors[2] = Vector3f(0, 0, 1);
+	}
+
+	if (m_engine.GetInput()->IsKeyPressed('R'))
+	{
+		Vector3f* positions = objectData->positions;
+		Vector3f* movements = objectData->movements;
+		unsigned int nrOfObjects = dataStorage->GetNrOfObjects();
+		for (unsigned int i = 0; i < nrOfObjects; i++)
+		{
+			positions[i] = Vector3f(0, 0, 0);
+			movements[i] = Vector3f(0, 0, 0);
+		}
+	}
+	if (m_engine.GetInput()->IsKeyPressed('T'))
+	{
+		Vector3f* movements = objectData->movements;
+		Vector3f* rotationAxises = objectData->rotationAxises;
+
+		unsigned int nrOfObjects = dataStorage->GetNrOfObjects();
+		for (unsigned int i = 0; i < nrOfObjects; i++)
+		{
+			float randX = (static_cast<float>(rand() % 1000) * 0.002f) - 1.0f;
+			float randY = (static_cast<float>(rand() % 1000) * 0.002f) - 1.0f;
+			float randZ = (static_cast<float>(rand() % 1000) * 0.002f) - 1.0f;
+
+			movements[i] = Vector3f(randX, randY, randZ).normalized() * 10.0f;
+			rotationAxises[i] = movements[i].crossLH(Vector3f(0, 1, 0));
+		}
+	}
+
+	if (m_engine.GetInput()->IsKeyPressed(VK_LBUTTON))
+	{
+		unsigned int nrOfObjects = dataStorage->GetNrOfObjects();
+		if (nrOfObjects > 0)
+		{
+			CameraV3* camera = m_engine.GetCameraManager()->GetCamera(m_cameraIndex);
+			Math::Ray ray = Math::CalculatePickingRay(camera->viewMatrix, camera->projectionMatrix, m_engine.GetInput()->MousePosition(), m_engine.GetWindowSize());
+
+			Vector3f* positions = objectData->positions;
+			Vector3f* movements = objectData->movements;
+			Vector3f* rotationAxises = objectData->rotationAxises;
+			int* textures = objectData->textureIndices;
+			Math::Sphere sphere;
+
+			float minDistance = INFINITY;
+			int minDistanceIndex = -1;
+
+			// Find the closest intersection
+			for (unsigned int i = 0; i < nrOfObjects; i++)
+			{
+				sphere.position = positions[i];
+
+				Math::Collision::RayIntersection intersection = Math::Collision::RayVsSphere(ray, sphere);
+				if (intersection.collisionOccured)
+				{
+					if (intersection.distance < minDistance)
+					{
+						minDistance = intersection.distance;
+						minDistanceIndex = i;
+					}
+				}
+			}
+
+			// Change the movement of the closest intersection, if any
+			if (minDistanceIndex != -1)
+			{
+				float randX = (static_cast<float>(rand() % 1000) * 0.002f) - 1.0f;
+				float randY = (static_cast<float>(rand() % 1000) * 0.002f) - 1.0f;
+				float randZ = (static_cast<float>(rand() % 1000) * 0.002f) - 1.0f;
+				movements[minDistanceIndex] = Vector3f(randX, randY, randZ).normalized() * 10.0f;
+				textures[minDistanceIndex] = 0;
+			}
+		}
+	}
 }

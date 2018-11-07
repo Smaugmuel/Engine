@@ -2,7 +2,6 @@
 #define ENGINE_HPP
 //#include "../Misc/Singleton.hpp"
 #include "../Math/Vector2.hpp"
-#include <chrono>
 
 #include "../FrameWork/FrameWorkManager.hpp"
 #include "MaterialManager.hpp"
@@ -19,7 +18,8 @@ public:
 
 	bool Initialize(Vector2i windowSize = Vector2i(800, 600));
 
-	bool Update();
+	bool Update(float dt);
+	CameraV3* GetActiveCamera();
 
 	void Clear(float r = 0.0f, float g = 0.0f, float b = 0.0f, float a = 1.0f);
 	void Render();
@@ -46,9 +46,6 @@ public:
 private:
 	//friend class Singleton<Engine>;
 
-	typedef std::chrono::high_resolution_clock Clock;
-	typedef std::chrono::time_point<std::chrono::steady_clock> Time;
-
 	void ControlCamera(float dt);
 
 	bool m_isRunning;
@@ -73,8 +70,6 @@ private:
 	CameraManagerV2 m_cameraManager;
 
 	FPSCounterV2 m_fps;
-	Time m_t1;
-	Time m_t2;
 };
 
 #endif

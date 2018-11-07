@@ -32,23 +32,12 @@ bool Engine::Initialize(Vector2i windowSize)
 	m_renderCameraIndex = -1;
 	m_hasFirstPersonControls = false;
 
-	m_t1 = Clock::now();
-	m_t2 = Clock::now();
-
 	return true;
 }
 
-bool Engine::Update()
+bool Engine::Update(float dt)
 {
 	MSG msg = { 0 };
-
-	/*
-	Calculate frame time
-	*/
-	m_t1 = m_t2;
-	m_t2 = Clock::now();
-	long long nanoSeconds = std::chrono::duration_cast<std::chrono::nanoseconds>(m_t2 - m_t1).count();
-	float dt = static_cast<float>(nanoSeconds * 0.000000001);
 
 	while (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
 	{
@@ -87,22 +76,30 @@ bool Engine::Update()
 	}
 	else
 	{
-		CameraV3* cam = m_cameraManager.GetCamera(m_renderCameraIndex);
-		if (cam)
-		{
-			// A camera is set, and it exists
-			if (m_hasFirstPersonControls)
-				ControlCamera(dt);
-			m_sceneManager.SetViewAndProjectionMatrices(cam->viewMatrix, cam->projectionMatrix);
-		}
-		else
-		{
-			// A camera is set, but it doesn't exist
-			m_renderCameraIndex = -1;
-		}
+		//CameraV3* cam = m_cameraManager.GetCamera(m_renderCameraIndex);
+		//if (cam)
+		//{
+		//	// A camera is set, and it exists
+		//	if (m_hasFirstPersonControls)
+		//		ControlCamera(dt);
+		//	m_sceneManager.SetViewAndProjectionMatrices(cam->viewMatrix, cam->projectionMatrix);
+		//}
+		//else
+		//{
+		//	// A camera is set, but it doesn't exist
+		//	m_renderCameraIndex = -1;
+		//}
 	}
 	
 	return m_isRunning;
+}
+
+CameraV3 * Engine::GetActiveCamera()
+{
+	if (m_renderCameraIndex == -1)
+		return nullptr;
+	else
+		return m_cameraManager.GetCamera(m_renderCameraIndex);
 }
 
 void Engine::Clear(float r, float g, float b, float a)
@@ -133,9 +130,10 @@ void Engine::DisableFirstPersonControls()
 	m_hasFirstPersonControls = false;
 }
 
+/*Moved To Game.cpp*/
 void Engine::ControlCamera(float dt)
 {
-	Input* input = m_frameWorkManager.GetInput();
+	/*Input* input = m_frameWorkManager.GetInput();
 	CameraV3* cam = m_cameraManager.GetCamera(m_renderCameraIndex);
 
 	bool isChanged = false;
@@ -202,7 +200,7 @@ void Engine::ControlCamera(float dt)
 	if (isChanged)
 	{
 		cam->UpdateViewMatrix();
-	}
+	}*/
 }
 
 void Engine::ShowFPSCounter()

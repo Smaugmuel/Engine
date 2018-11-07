@@ -3,6 +3,7 @@
 #include "../Engine/Core/Engine.hpp"
 #include "../Engine/Misc/StateMachines/StateMachineV2.hpp"
 #include "../Engine/Events/EventReceiver.hpp"
+#include <chrono>
 
 //enum RenderMode
 //{
@@ -40,7 +41,17 @@ public:
 	void Run();
 
 private:
+	/*Used To Calculate deltatime between updates/render*/
+	typedef std::chrono::high_resolution_clock Clock;
+	typedef std::chrono::time_point<std::chrono::steady_clock> Time;
+
+	Time m_t1;
+	Time m_t2;
+
 	void ReceiveEvent(const Event& e) final override;
+	void CheckFPSRelatedInput(float dt);
+	void CheckNonFPSRelatedInput(float dt);
+
 
 	/*void RenderNormal();
 	void RenderDeferredFirstPass();
@@ -64,10 +75,15 @@ private:
 	Engine m_engine;
 
 	int m_cameraIndex;
-	
 	int m_GUIhelloWorldIndex;
 
 	std::vector<ObjectV4*> m_objects;
+
+	/*
+	If true, Map input to move the Camera in the editor, else use input for something else.
+	For exemple, have a condition, if ScrollWheel is down, m_UseFPSControles = true.
+	*/
+	bool m_UseFPSControls;
 
 	/*RenderMode m_renderMode;
 	HUDMode m_HUDMode;
