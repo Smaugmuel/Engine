@@ -263,7 +263,19 @@ void Game::CheckFPSRelatedInput(float dt)
 		float movementSpeed = 10.0f;
 		float rotationSpeed = 0.2f;
 
-		if (input->IsKeyDown('B'))
+		/*Space and control is above shift, so they are not affected by boost*/
+		if (input->IsKeyDown(VK_SPACE))
+		{
+			cam->MoveUp(movementSpeed * dt * 5);
+			isChanged = true;
+		}
+		if (input->IsKeyDown(VK_CONTROL))
+		{
+			cam->MoveUp(-movementSpeed * dt * 5);
+			isChanged = true;
+		}
+
+		if (input->IsKeyDown(VK_SHIFT))
 			movementSpeed *= 10.0f;
 
 		if (input->IsKeyDown('D'))
@@ -284,16 +296,6 @@ void Game::CheckFPSRelatedInput(float dt)
 		if (input->IsKeyDown('S'))
 		{
 			cam->MoveForward(-movementSpeed * dt);
-			isChanged = true;
-		}
-		if (input->IsKeyDown(VK_SPACE))
-		{
-			cam->MoveUp(movementSpeed * dt);
-			isChanged = true;
-		}
-		if (input->IsKeyDown(VK_SHIFT))
-		{
-			cam->MoveUp(-movementSpeed * dt);
 			isChanged = true;
 		}
 
