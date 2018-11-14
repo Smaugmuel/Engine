@@ -21,7 +21,7 @@ bool ShaderCreatorV2::Initialize(ID3D11Device * device)
 
 VertexShaderData ShaderCreatorV2::CompileAndCreateVertexShader(int nrOfDefines, ShaderDefine* defines)
 {
-	const wchar_t* wPath = L"../SheepEngine/FrameWork/HLSL/VS_Generic.hlsl";
+	const wchar_t* wPath = L"../SheepFrameWork/HLSL/VS_Generic.hlsl";
 	std::unique_ptr<_D3D_SHADER_MACRO[]> macros = nullptr;
 	_D3D_SHADER_MACRO* macrosRaw = nullptr;
 	VertexShaderData shaderData;
@@ -53,7 +53,8 @@ VertexShaderData ShaderCreatorV2::CompileAndCreateVertexShader(int nrOfDefines, 
 	/*
 	Compile shader
 	*/
-	if (FAILED(D3DCompileFromFile(wPath, macrosRaw, nullptr, "main", "vs_5_0", 0, 0, &shaderData.blob, nullptr)))
+	HRESULT result = D3DCompileFromFile(wPath, macrosRaw, nullptr, "main", "vs_5_0", 0, 0, &shaderData.blob, nullptr);
+	if (FAILED(result))
 	{
 		return shaderData;
 	}
@@ -86,7 +87,7 @@ ID3D11GeometryShader * ShaderCreatorV2::CompileAndCreateGeometryShaderFromFile(c
 	/*
 	Add path to file name
 	*/
-	wName = L"../SheepEngine/FrameWork/HLSL/" + wName;
+	wName = L"../SheepFrameWork/HLSL/" + wName;
 	const wchar_t* wPath = wName.c_str();
 
 	if (nrOfDefines > 0)
@@ -151,7 +152,7 @@ ID3D11PixelShader * ShaderCreatorV2::CompileAndCreatePixelShaderFromFile(const c
 	/*
 	Add path to file name
 	*/
-	wName = L"../SheepEngine/FrameWork/HLSL/" + wName;
+	wName = L"../SheepFrameWork/HLSL/" + wName;
 	const wchar_t* wPath = wName.c_str();
 
 	if (nrOfDefines > 0)

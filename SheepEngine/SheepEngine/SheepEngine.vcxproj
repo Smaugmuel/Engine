@@ -123,32 +123,12 @@
     <ClCompile Include="Core\ModelManager.cpp" />
     <ClCompile Include="Core\SceneManagerV3.cpp" />
     <ClCompile Include="Events\EventDispatcher.cpp" />
-    <ClCompile Include="FrameWork\ConstantBufferManager.cpp" />
-    <ClCompile Include="FrameWork\DeferredRenderingManager.cpp" />
-    <ClCompile Include="FrameWork\Direct3D.cpp" />
-    <ClCompile Include="FrameWork\FrameWorkManager.cpp" />
-    <ClCompile Include="FrameWork\GUIManager.cpp" />
-    <ClCompile Include="FrameWork\Input.cpp" />
-    <ClCompile Include="FrameWork\OnScreenTarget.cpp" />
-    <ClCompile Include="FrameWork\SamplerManager.cpp" />
-    <ClCompile Include="FrameWork\ShaderCreation\InputLayoutCreator.cpp" />
-    <ClCompile Include="FrameWork\ShaderCreation\ShaderCreatorV2.cpp" />
-    <ClCompile Include="FrameWork\ShaderManagerV2.cpp" />
-    <ClCompile Include="FrameWork\ShadowMapRenderingManager.cpp" />
-    <ClCompile Include="FrameWork\TextureManager.cpp" />
-    <ClCompile Include="FrameWork\VertexBufferManager.cpp" />
-    <ClCompile Include="FrameWork\Window.cpp" />
-    <ClCompile Include="GUI\FPS_CounterV2.cpp" />
-    <ClCompile Include="FrameWork\Math\AABA.cpp" />
-    <ClCompile Include="FrameWork\Math\AABB.cpp" />
-    <ClCompile Include="Math\Frustum.cpp">
+        <ClCompile Include="GUI\FPS_CounterV2.cpp" />
+        <ClCompile Include="Math\Frustum.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="FrameWork\Math\Math.cpp" />
-    <ClCompile Include="FrameWork\Math\Matrix.cpp" />
-    <ClCompile Include="Misc\HelperFunctions.cpp" />
-    <ClCompile Include="FrameWork\StringConverter.cpp" />
+        <ClCompile Include="Misc\HelperFunctions.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Core\CameraManagerV2.hpp" />
