@@ -20,33 +20,33 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
-    <ProjectGuid>{E8347B37-7D52-4161-99CF-D3F08DAEC60D}</ProjectGuid>
+    <ProjectGuid>{39366740-E8A5-469C-B95F-D0025EBFBFE1}</ProjectGuid>
     <RootNamespace>SheepEngine</RootNamespace>
     <WindowsTargetPlatformVersion>10.0.16299.0</WindowsTargetPlatformVersion>
-    <ProjectName>SheepEngine</ProjectName>
+    <ProjectName>SheepGame</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v141</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v141</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v141</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v141</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
@@ -116,62 +116,25 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Core\CameraManagerV2.cpp" />
-    <ClCompile Include="Core\CameraV3.cpp" />
-    <ClCompile Include="Core\Engine.cpp" />
-    <ClCompile Include="Core\MaterialManager.cpp" />
-    <ClCompile Include="Core\ModelManager.cpp" />
-    <ClCompile Include="Core\SceneManagerV3.cpp" />
-    <ClCompile Include="Events\EventDispatcher.cpp" />
-    <ClCompile Include="FrameWork\ConstantBufferManager.cpp" />
-    <ClCompile Include="FrameWork\DeferredRenderingManager.cpp" />
-    <ClCompile Include="FrameWork\Direct3D.cpp" />
-    <ClCompile Include="FrameWork\FrameWorkManager.cpp" />
-    <ClCompile Include="FrameWork\GUIManager.cpp" />
-    <ClCompile Include="FrameWork\Input.cpp" />
-    <ClCompile Include="FrameWork\OnScreenTarget.cpp" />
-    <ClCompile Include="FrameWork\SamplerManager.cpp" />
-    <ClCompile Include="FrameWork\ShaderCreation\InputLayoutCreator.cpp" />
-    <ClCompile Include="FrameWork\ShaderCreation\ShaderCreatorV2.cpp" />
-    <ClCompile Include="FrameWork\ShaderManagerV2.cpp" />
-    <ClCompile Include="FrameWork\ShadowMapRenderingManager.cpp" />
-    <ClCompile Include="FrameWork\TextureManager.cpp" />
-    <ClCompile Include="FrameWork\VertexBufferManager.cpp" />
-    <ClCompile Include="FrameWork\Window.cpp" />
-    <ClCompile Include="GUI\FPS_CounterV2.cpp" />
-    <ClCompile Include="FrameWork\Math\AABA.cpp" />
-    <ClCompile Include="FrameWork\Math\AABB.cpp" />
-    <ClCompile Include="Math\Frustum.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    <ClCompile Include="Game.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="FrameWork\Math\Math.cpp" />
-    <ClCompile Include="FrameWork\Math\Matrix.cpp" />
-    <ClCompile Include="Misc\HelperFunctions.cpp" />
-    <ClCompile Include="FrameWork\StringConverter.cpp" />
+    <ClCompile Include="Main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Core\CameraManagerV2.hpp" />
-    <ClInclude Include="Core\CameraV3.hpp" />
-    <ClInclude Include="Core\DataStorage.hpp" />
-    <ClInclude Include="Core\Engine.hpp" />
-    <ClInclude Include="Core\MaterialManager.hpp" />
-    <ClInclude Include="Core\ModelManager.hpp" />
-    <ClInclude Include="Core\SceneManagerV3.hpp" />
-    <ClInclude Include="Events\Event.hpp" />
-    <ClInclude Include="Events\EventDispatcher.hpp" />
-    <ClInclude Include="Events\EventReceiver.hpp" />
-    <ClInclude Include="Events\EventTypes.hpp" />
-    <ClInclude Include="GUI\FPS_CounterV2.hpp" />
-    <ClInclude Include="Math\Frustum.hpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    <ClInclude Include="Game.hpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
     </ClInclude>
-    <ClInclude Include="Misc\HelperFunctions.hpp" />
-    <ClInclude Include="Misc\Singleton.hpp" />
-    <ClInclude Include="Misc\StateMachines\StateMachine.hpp" />
-    <ClInclude Include="Misc\StateMachines\StateMachines.hpp" />
-    <ClInclude Include="Misc\StateMachines\StateMachineV2.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\SheepEngine\SheepEngine.vcxproj">
+      <Project>{e8347b37-7d52-4161-99cf-d3f08daec60d}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\SheepFrameWork\SheepFrameWork.vcxproj">
+      <Project>{e418b56d-0162-443f-89e1-bf9cfc4a22f2}</Project>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
